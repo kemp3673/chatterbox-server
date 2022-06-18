@@ -1,3 +1,6 @@
+const {dataSet} = require('./classes/messages/dataSet');
+var stubs = require('./spec/Stubs');
+var querystring = require('querystring')
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -11,6 +14,8 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+// It is access page, but not invoking function
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -31,6 +36,9 @@ var requestHandler = function(request, response) {
 
   // The outgoing status.
   var statusCode = 200;
+  var postCode = 201;
+  //var
+  var notFoundCode = 404;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -39,11 +47,11 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
+  headers['Content-Type'] = 'application/json';
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -52,7 +60,47 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+
+
+
+
+
+  if (request.url === '/classes/messages') {
+    if (request.method === "GET") {
+      console.log('GET req', statusCode);
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(dataSet));
+    }
+  }
+  if (request.url === '/classes/messages') {
+    if (request.method === "OPTIONS") {
+      console.log('OPTIONS req', statusCode);
+      response.writeHead(statusCode, headers);
+      response.end('PASSED');
+    }
+  }
+  if (request.method === "POST") {
+    console.log('POST req', postCode);
+    var post = '';
+    var i = dataSet.length;
+    request.on('data', function(chunk) {
+      post += chunk;
+    })
+    request.on('end', function() {
+      post = querystring.parse(post);
+      dataSet.push({...JSON.parse(Object.keys(post)), message_id: i});
+      i++;
+      response.writeHead(postCode, headers);
+      response.end('create')
+    })
+
+  }
+  if (request.url !== '/classes/messages') {
+    console.log('ERROR', notFoundCode);
+    response.writeHead(notFoundCode, headers);
+    response.end('404 not found');
+  }
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -70,3 +118,14 @@ var defaultCorsHeaders = {
   'access-control-allow-headers': 'content-type, accept, authorization',
   'access-control-max-age': 10 // Seconds.
 };
+
+module.exports = {requestHandler}
+//exports.requestHandler = requestHandler;
+
+// exports.taco = getName;
+// module.exports = () => { console.log('bar'); };·
+// methods.exports = {taco: requestHandler};
+
+
+
+//server: `http://127.0.0.1:3000/classes/messages`

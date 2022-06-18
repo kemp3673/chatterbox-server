@@ -1,4 +1,6 @@
 /* Import node's http module: */
+const {requestHandler} = require('./request-handler');
+
 var http = require('http');
 
 
@@ -22,9 +24,27 @@ var ip = '127.0.0.1';
 // incoming requests.
 //
 // After creating the server, we will tell it to listen on the given port and IP. */
-var server = http.createServer(handleRequest);
+var server = http.createServer(requestHandler);
 console.log('Listening on http://' + ip + ':' + port);
 server.listen(port, ip);
+
+// console.log(http.request);
+// console.log(http);
+
+// const http = require('node:http');
+
+// // Create a local server to receive data from
+// const server = http.createServer();
+
+// // Listen to the request event
+// server.on('request', (request, res) => {
+//   res.writeHead(200, { 'Content-Type': 'application/json' });
+//   res.end(JSON.stringify({
+//     data: 'Hello World!'
+//   }));
+// });
+
+// server.listen(8000);
 
 // To start this server, run:
 //
